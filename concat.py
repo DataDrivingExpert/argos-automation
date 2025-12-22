@@ -10,9 +10,9 @@ def exec(out_filename:str='output') -> Path:
     files = list(FILES_PATH.glob("*.csv"))
     df_list = [pd.read_csv(file) for file in files]
     argosDf = pd.concat(df_list, axis=0)
-    outpath = FILES_PATH / f'{out_filename}.xlsx'
-    argosDf.to_excel(outpath, index=False)
-    print(len(df_list), " archivos consolidados")
+    outpath = FILES_PATH / f'{out_filename}.csv'
+    argosDf.to_csv(outpath, index=False)
+    print(len(df_list), "archivos consolidados")
 
     return outpath
 
