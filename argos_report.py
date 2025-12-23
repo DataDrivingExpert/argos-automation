@@ -9,7 +9,7 @@ PASSWORD = getenv('ARG_PWD')
 
 def run(playwright: Playwright) -> None:
     DOWNLOAD_PATH = './documents/'
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
     # Acceso
