@@ -7,8 +7,8 @@ BASE_DIR = BASE_PATH.parent
 FILES_PATH = BASE_DIR / 'documents'
 
 def exec(out_filename:str='output') -> Path:
-    files = list(FILES_PATH.glob("*.csv"))
-    df_list = [pd.read_csv(file) for file in files]
+    files = list(FILES_PATH.glob("*.xlsx"))
+    df_list = [pd.read_excel(file) for file in files]
     argosDf = pd.concat(df_list, axis=0)
     outpath = FILES_PATH / f'{out_filename}.csv'
     argosDf.to_csv(outpath, index=False)

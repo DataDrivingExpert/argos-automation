@@ -1,7 +1,6 @@
 import gspread
 import pandas as pd
 from gspread_dataframe import set_with_dataframe
-from gspread.utils import rowcol_to_a1
 from dotenv import load_dotenv
 import os
 
@@ -19,32 +18,21 @@ edu_ws = edu_doc.worksheet('Argos')
 # Leer documento consolidado
 data = pd.read_csv('documents/output.csv')
 
+data["ID BANNER"] = data["ID BANNER"].astype(str)
+data["CELULAR"] = data["CELULAR"].astype(str)
+
 # Filtrar por programas
 ing = data.query('PROGRAMA == "DI194_413" or PROGRAMA == "DI172_413"')
 edu = data.loc[~data["PROGRAMA"].isin(ing["PROGRAMA"].unique())]
 
-# Map de las columnas para traducir nombre en letra de columna
-cols_map = {
-    col_name: rowcol_to_a1(1, i + 1).replace('1', '') 
-    for i, col_name in enumerate(ing.columns)
-}
+ing = ing.query('`VERSION PROGRAMA` in ["V002", "V004"]')
+edu = edu.query('`VERSION PROGRAMA` == "V001"')
 
-def buscarv_formula(idx:int) -> str:
-    id_banner_col = cols_map["ID_BANNER"]
-    return f"=BUSCARV({id_banner_col}{idx+2};Postulaciones!A:A;1;FALSO)"
+# Verificación de seguridad
+assert not ing.empty and not edu.empty, "Deteniendo la ejecución para evitar sustitución con DataFrame vacío."
 
-# Incluir buscarv
-edu.insert(
-    edu.columns.get_loc('PROGRAMA') + 1, 
-    'Cruce', 
-    edu.apply(lambda row: buscarv_formula(edu.index.get_loc(row.name)), axis=1)
-)
-
-ing.insert(
-    ing.columns.get_loc('PROGRAMA') + 1, 
-    'Cruce', 
-    ing.apply(lambda row: buscarv_formula(ing.index.get_loc(row.name)), axis=1)
-)
+# print(ing.head(), ing.shape)
+# print(edu.head(), edu.shape)
 
 # Cargar datos
 ing_ws.clear()
