@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from playwright.sync_api import Playwright, sync_playwright, expect
 from dotenv import load_dotenv
 import os
@@ -11,7 +12,7 @@ DOWNLOAD_PATH = "./documents/"
 
 assert USER is not None and PASSWORD is not None, "Faltan las variables de entorno"
 
-def run(playwright: Playwright) -> None:
+def _run(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
@@ -106,7 +107,7 @@ def run(playwright: Playwright) -> None:
         page.get_by_role("button", name="Exportar Excel").click()
     download6 = download6_info.value
     download6.save_as(DOWNLOAD_PATH + "DI142_413.xlsx")
-    # Programa 142_413
+    # Programa 166_413
     page.get_by_role("button", name="Seleccione Carrera").click()
     page.get_by_role("option", name="I166 - DIP EN INNOV EN LA").click()
     page.get_by_role("button", name="Seleccione Programa").click()
@@ -123,5 +124,28 @@ def run(playwright: Playwright) -> None:
     browser.close()
 
 
-with sync_playwright() as playwright:
-    run(playwright)
+def run() -> bool:
+    """Ejecuta el proceso de extracción y verifica descargas exitosas.
+
+    Retorna True si todos los archivos esperados existen.
+    Lanza excepción si ocurre algún error durante la extracción o validación.
+    """
+    expected = [
+        "DI194_413.xlsx",
+        "DI172_413.xlsx",
+        "DI143_413.xlsx",
+        "DI025_413.xlsx",
+        "DI107_413.xlsx",
+        "DI151_413.xlsx",
+        "DI142_413.xlsx",
+        "DI166_413.xlsx",
+    ]
+    with sync_playwright() as playwright:
+        _run(playwright)
+
+    # Validar que las descargas existen
+    docs_path = Path(DOWNLOAD_PATH)
+    missing = [name for name in expected if not (docs_path / name).exists()]
+    if missing:
+        raise RuntimeError(f"Archivos faltantes tras extracción: {', '.join(missing)}")
+    return True
