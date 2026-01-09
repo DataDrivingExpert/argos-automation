@@ -1,0 +1,5 @@
+gspread==6.2.1
+gspread_dataframe==4.0.0
+pandas==2.3.3
+playwright==1.57.0
+python-dotenv==1.2.1

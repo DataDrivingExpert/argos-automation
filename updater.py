@@ -24,10 +24,12 @@ def exec():
     data["CELULAR"] = data["CELULAR"].astype(str)
 
     # Filtrar por programas
-    ing = data.query('PROGRAMA == "DI194_413" or PROGRAMA == "DI172_413"')
+    ing = pd.concat([
+        data.query('PROGRAMA == "DI194_413" and `VERSION PROGRAMA` == "V002"'),
+        data.query('PROGRAMA == "DI172_413" and `VERSION PROGRAMA` == "V004"')
+    ])
+    # Filtrar educación
     edu = data.loc[~data["PROGRAMA"].isin(ing["PROGRAMA"].unique())]
-
-    ing = ing.query('`VERSION PROGRAMA` in ["V002", "V004"]')
     edu = edu.query('`VERSION PROGRAMA` == "V001"')
 
     # Verificación de seguridad
